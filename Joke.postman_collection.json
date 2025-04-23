@@ -1,0 +1,1714 @@
+{
+	"info": {
+		"_postman_id": "6c60e226-e499-42b7-b47d-c6aee2ac2da5",
+		"name": "Akademie - Students",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24249999"
+	},
+	"item": [
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "grandToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"let result = pm.response.json();",
+									"pm.environment.set(\"token\", result.id_token);",
+									"",
+									"",
+									"",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"grant_type\": \"password\",\n\t\"accessCode1\": \"{{accessCode1}}\",\n\t\"accessCode2\": \"{{accessCode2}}\",\n\t\"scope\": \"openid offline_access https://\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://uuidentity.plus4u.net/uu-oidc-maing02/bb977a99f4cc4c37a2afce3fd599d0a7/oidc/grantToken",
+							"protocol": "https",
+							"host": [
+								"uuidentity",
+								"plus4u",
+								"net"
+							],
+							"path": [
+								"uu-oidc-maing02",
+								"bb977a99f4cc4c37a2afce3fd599d0a7",
+								"oidc",
+								"grantToken"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category CRUD",
+			"item": [
+				{
+					"name": "category/create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"categoryId\", result.id);\r",
+									"\r",
+									"\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(pm.environment.get(\"randomUniversalCategoryCode\"));\r",
+									"     pm.expect(result.icon).to.eql(\"label\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check JSON schema\", function(){\r",
+									"    pm.expect(result.awid).to.be.a(\"string\");\r",
+									"    pm.expect(result.awid).not.to.eql(null);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomCode = \"Univerzální_název_kategorie_\"; //do proměnné uložím string hodnotu\r",
+									"var uuInt = Math.floor(Math.random() * 1000000);//do proměnné uuINT uložím random vygenerované číslo\r",
+									"var result = randomCode + uuInt; //složím výše uvedené proměnné dohromady\r",
+									"pm.environment.set(\"randomUniversalCategoryCode\", result);//uložím do ENV\r",
+									"console.log(result);//zaloguji do konzole\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie996230\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie800230"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{randomUniversalCategoryCode}}\",\n    \"icon\": \"label\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(\"Category 1\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{categoryId}}\",\n\t\"name\": \"Category 1\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/update",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.id).to.eql(pm.environment.get(\"categoryId\"));\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"id\": \"{{categoryId}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/get",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/list",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{categoryId}}\", // unique identifier of category; required\n  \"forceDelete\": true // true / false; if true, uuCmd will delete the category, even if it has jokes assigned into it\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/delete",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category CRUD Alternative scen",
+			"item": [
+				{
+					"name": "category/create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"categoryId\", result.id);\r",
+									"pm.environment.set(\"categoryName\",result.name);\r",
+									"\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(pm.environment.get(\"randomUniversalCategoryCode\"));\r",
+									"     pm.expect(result.icon).to.eql(\"label\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check JSON schema\", function(){\r",
+									"    pm.expect(result.awid).to.be.a(\"string\");\r",
+									"    pm.expect(result.awid).not.to.eql(null);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomCode = \"Univerzální_název_kategorie_\"; //do proměnné uložím string hodnotu\r",
+									"var uuInt = Math.floor(Math.random() * 1000000);//do proměnné uuINT uložím random vygenerované číslo\r",
+									"var result = randomCode + uuInt; //složím výše uvedené proměnné dohromady\r",
+									"pm.environment.set(\"randomUniversalCategoryCode\", result);//uložím do ENV\r",
+									"console.log(result);//zaloguji do konzole\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie996230\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie800230"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{randomUniversalCategoryCode}}\",\n    \"icon\": \"label\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/create invalid dtoIn",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body matches string - Create category by category DAO create failed\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Create category by category DAO create failed.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{categoryName}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{categoryId}}\",\n \"forceDelete\": true // true / false; if true, uuCmd will delete the category, even if it has jokes assigned into it\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/delete",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Category CRUD Alternative scen 2",
+			"item": [
+				{
+					"name": "category/create icon>40",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"categoryId\", result.id);\r",
+									"\r",
+									"pm.test(\"Body matches string - The value must not be longer than 40 characters\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"The value must not be longer than 40 characters.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomCode = \"Univerzální_název_kategorie_\"; //do proměnné uložím string hodnotu\r",
+									"var uuInt = Math.floor(Math.random() * 1000000);//do proměnné uuINT uložím random vygenerované číslo\r",
+									"var result = randomCode + uuInt; //složím výše uvedené proměnné dohromady\r",
+									"pm.environment.set(\"randomUniversalCategoryCode\", result);//uložím do ENV\r",
+									"console.log(result);//zaloguji do konzole\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie996230\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie800230"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{randomUniversalCategoryCode}}\",\n    \"icon\": \"ldjfhrydhfbdhfjdhfbquwyetrgfbvhcvdgffxvsgdhqowieuryhchc\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/create name >255",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"categoryId\", result.id);\r",
+									"\r",
+									"pm.test(\"Body matches string - The value must not be longer than 255 characters\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"The value must not be longer than 255 characters.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"function generateRandomCode() {\r",
+									"    const length = Math.floor(Math.random() * (265 - 255 + 1)) + 255; // Random length between 255 and 265\r",
+									"    const charset = \"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789\";\r",
+									"    let randomCode = \"Univerzální_název_kategorie_\"; // Starting prefix\r",
+									"\r",
+									"    // Generate random characters\r",
+									"    for (let i = randomCode.length; i < length; i++) {\r",
+									"        randomCode += charset.charAt(Math.floor(Math.random() * charset.length));\r",
+									"    }\r",
+									"\r",
+									"    return randomCode;\r",
+									"}\r",
+									"\r",
+									"var randomCode = generateRandomCode();\r",
+									"console.log(randomCode); // Display the random code\r",
+									"\r",
+									"var uuInt = Math.floor(Math.random() * 1000000);//do proměnné uuINT uložím random vygenerované číslo\r",
+									"var result = randomCode + uuInt; //složím výše uvedené proměnné dohromady\r",
+									"pm.environment.set(\"randomUniversalCategoryCode\", result);//uložím do ENV\r",
+									"console.log(result);//zaloguji do konzole\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie996230\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie800230"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{randomUniversalCategoryCode}}\",\n    \"icon\": \"QWE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/create name <1",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"categoryId\", result.id);\r",
+									"\r",
+									"pm.test(\"Body matches string - The value must be longer than 1 character\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"The value must be longer than 1 character.\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"\",\n    \"icon\": \"QWE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Joke CRUD Happy Day Test",
+			"item": [
+				{
+					"name": "category/create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"categoryId\", result.id);\r",
+									"\r",
+									"\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(pm.environment.get(\"randomUniversalCategoryCode\"));\r",
+									"     pm.expect(result.icon).to.eql(\"label\")\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check JSON schema\", function(){\r",
+									"    pm.expect(result.awid).to.be.a(\"string\");\r",
+									"    pm.expect(result.awid).not.to.eql(null);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var randomCode = \"Univerzální_název_kategorie_\"; //do proměnné uložím string hodnotu\r",
+									"var uuInt = Math.floor(Math.random() * 1000000);//do proměnné uuINT uložím random vygenerované číslo\r",
+									"var result = randomCode + uuInt; //složím výše uvedené proměnné dohromady\r",
+									"pm.environment.set(\"randomUniversalCategoryCode\", result);//uložím do ENV\r",
+									"console.log(result);//zaloguji do konzole\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie996230\r",
+									"//Když se to pustí první tak bude výsledek např. Univerzální_název_kategorie800230"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"{{randomUniversalCategoryCode}}\",\n    \"icon\": \"label\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"pm.environment.set(\"jokeID\", result.id);\r",
+									"\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(\"Vtipy o policajtech\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check JSON schema\", function(){\r",
+									"    pm.expect(result.awid).to.be.a(\"string\");\r",
+									"    pm.expect(result.awid).not.to.eql(null);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Vtipy o policajtech\",\n\t\"text\": \"Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!“\",\n\t\"categoryIdList\": [\"{{categoryId}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/update",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(\"Hurvínek a moucha\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check JSON schema\", function(){\r",
+									"    pm.expect(result.awid).to.be.a(\"string\");\r",
+									"    pm.expect(result.awid).not.to.eql(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Rev is 1\", function () {\r",
+									"    pm.expect(result.sys.rev).to.eql(1);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{jokeID}}\", // identifier of a joke; required\n  \"name\": \"Hurvínek a moucha\", // new name of joke\n  \"text\": \"Víš co řekl ...\" // new text of the joke\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/update",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"update"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/get",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check JSON schema\", function(){\r",
+									"    pm.expect(result.awid).to.be.a(\"string\");\r",
+									"    pm.expect(result.awid).not.to.eql(null);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Check that my inputs are filled in ouputs.\", function () {\r",
+									"     pm.expect(result.name).to.eql(\"Hurvínek a moucha\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{jokeID}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/get",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"get"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/list",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body matches string\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"Vtipy o policajtech 3\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order\": \"desc\",\n    \"pageInfo\": {\n        \"pageIndex\": 0,\n        \"pageSize\": 100\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/list",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"id\": \"{{jokeID}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/delete",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "category/delete",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									" //kontrola, že error mapa je object datový typ a že je prázdná - to znamený že obsahuje {}\r",
+									"pm.test(\"Check if errorMap is empty\", function () {\r",
+									"    pm.expect(result.uuAppErrorMap).to.be.an(\"object\").that.is.empty;\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"id\": \"{{categoryId}}\", // unique identifier of category; required\n  \"forceDelete\": true // true / false; if true, uuCmd will delete the category, even if it has jokes assigned into it\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/category/delete",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"category",
+								"delete"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Joke CRUD Happy Day Test Alternative scen",
+			"item": [
+				{
+					"name": "joke/create",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Body matches string - DtoIn is not valid\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"DtoIn is not valid.\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body matches string - The value is required but missing.\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"The value is required but missing.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": null,\n\t\"text\": \"Dnes mě zastavilo policejní auto a prý jestli mám přezuto.No to je snad jasný, že nebudu řídit v bačkorách.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/create 2",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Body matches string - DtoIn is not valid\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"DtoIn is not valid.\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body matches string - The value must be longer than 1 character.\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"The value must be longer than 1 character.\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"\",\n\t\"text\": \"Dnes mě zastavilo policejní auto a prý jestli mám přezuto.No to je snad jasný, že nebudu řídit v bačkorách.\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"create"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "joke/create 3",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 400\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									"\r",
+									"let result = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Body matches string - DtoIn is not valid\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"DtoIn is not valid.\");\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Body matches string - The value must be longer than 1 character.\", function () {\r",
+									"    pm.expect(pm.response.text()).to.include(\"TThe value must not be longer than 255 characters\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\t\"name\": \"Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!\",\n\t\"text\": \"Policie zastaví auto a po kontrole policajt říká:„Tak to máme sjeté gumy, nefunkční přední světlo a prasklý nárazník. Celkem za čtyři a půl tisíce korun.“Řidič na to reaguje: „To jako fakt? Tak se do toho pusťte, v servisu chtěli deset!“\",\n\t\"categoryIdList\": [\"{{categoryId}}\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{protocol}}://{{host}}/{{appName}}/{{awid}}/joke/create",
+							"protocol": "{{protocol}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"{{appName}}",
+								"{{awid}}",
+								"joke",
+								"create"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
